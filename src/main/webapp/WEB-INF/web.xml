@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+    <!--                                       实现:加载整合springmvc-->
+
+
+    <!--  项目启动默认加载-->
+    <!--  上下文加载监听器-->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!--  spring的配置文件applicaiton.xml(项目启动会加载spring文件（applicaiton）)-->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath:application*.xml</param-value> <!--填空:（所有applicaiton名字一样.xml）文件名称-->
+    </context-param>
+    <!--  项目启动默认加载结束-->
+
+
+    <!--  配置springmvc文件-->
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <!--如果spring-mvc.xml不在默认WEB-INF下（或者名字不叫spring-mvc.xml），需要配置init-param去找到他-->
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring-mvc.xml</param-value>  <!--填空:（spring-mvc.xml）文件名称-->
+        </init-param>
+    </servlet>
+    <!--  servlet路径映射关系映射springmvc-->
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>/</url-pattern>  <!--填空:/代表接受所有请求（无特别要求默认/*）-->
+    </servlet-mapping>
+    <!--  配置springmvc文件结束-->
+
+
+
+
+
+    <!--shiro整合 ssm -->
+    <!--  过滤器UTF-8  处理中文乱码-->
+    <filter>
+        <filter-name>encodingFilter</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encodingFilter</filter-name>
+        <url-pattern>/*</url-pattern> <!--填空:/*代表所有请求（无特别要求默认/*）-->
+    </filter-mapping>
+
+
+
+    <!-- -->
+    <filter>
+        <filter-name>shiroFilter</filter-name>
+        <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+        <init-param>
+            <param-name>targetFilterLifecycle</param-name>
+            <param-value>true</param-value>
+        </init-param>
+        <init-param>
+            <param-name>targetBeanName</param-name><!--targetBeanName很重要 意味着--><!-- shiro的web过滤器   id-->
+
+
+            <param-value>shiroFilter</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>shiroFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <!--shiro整合 ssm  结束-->
+</web-app>

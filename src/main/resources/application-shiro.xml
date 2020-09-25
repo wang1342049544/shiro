@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--登录成功后跳到指定页面-->
+    <context:component-scan base-package="com.hdax.ssm.fitter"/>
+
+    <!--自定义LogoutFilter,退出-->
+    <bean id="logoutFilter" class="com.hdax.ssm.fitter.SystemLogoutFilter">
+        <property name="redirectUrl" value="/ssm/login"/>
+    </bean>
+
+    <!--
+    shiro的web过滤器
+    -->
+
+
+   <!-- 第一个bean web.xml的  <param-value>shiroFilter</param-value>名称 相匹配-->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <!--第一个要走的请求路径-->
+        <property name="loginUrl" value="/user/login"/>
+        <!--认证通过后的跳转   路径再 fitter MyFormAuthenticationFilte类 因为有了这个类才可以跳转成功-->
+        <property name="successUrl" value="/user/main"/>
+        <!--认证角色权限不成功的跳转-->
+        <property name="unauthorizedUrl" value="refuse.jsp"/>
+        <!--引用安全管理器-->
+        <property name="securityManager" ref="securityManager"/>
+
+        <!--
+            shiro提供的过滤器链条
+         -->
+        <property name="filterChainDefinitions">
+            <value>
+                <!--退出功能过滤器-->
+                /logout=logout
+
+                <!--
+                    匿名访问过滤器
+                    左边路径  anon匹配的过滤器
+                -->
+                <!-- static静态文件 包含css js images-->
+                /static/** = anon
+
+                /refuse.jsp = anon
+
+                /user/rememberMeTest =user
+                <!--认证过滤器 上边允许匿名 下边是一定要经过认证 前边/**是所有需要认证的-->
+                /** = authc
+            </value>
+        </property>
+
+     <!--   配置MyFormAuthenticationFilte类  跳到指定的mian-->
+        <property name="filters">
+            <map>
+                <entry key="authc" value-ref="formFilter"/>
+            </map>
+        </property>
+
+    </bean>
+
+
+    <!--
+        安全管理器
+    -->
+
+    <!--第二个bean  针对web应用 -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <property name="realm" ref="myrealm"/><!-- 引用第三个bean 的 id-->
+        <property name="rememberMeManager" ref="rememberMeManager"/> <!-- 引用cookie的id 第五个bean -->
+        <property name="sessionManager" ref="sessionManager"/> <!--引用session-->
+        <property name="cacheManager" ref="cacheManager"/><!--引用缓存-->
+    </bean>
+
+
+   <!--
+       自定义领域myrealm
+   -->
+        <!--  第三个bean 没整合前 是放在realm 再ini文件里边  现在单独创建realm 文件夹-->
+    <bean id="myrealm" class="com.hdax.ssm.realm.CustomRealm">
+        <!--加密用的  不加密必须关掉-->
+         <property name="credentialsMatcher"  ref="credentialsMatcher"/>  <!--引用第四个bean-->
+
+    </bean>
+
+   <!--
+        凭证匹配器
+    -->
+
+    <!--第4个bean  加密-->
+    <bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+        <property name="hashAlgorithmName" value="md5"/> <!--hashAlgorithmName 散列算法是  md5-->
+        <property name="hashIterations" value="2"/> <!--散列的时候一次密码可能不够 两次-->
+    </bean>
+
+
+   <!--
+      cookie 实现记住我功能 每次登录记住账号密码
+      退出功能会清空cookie 所以测试 cookie  不要退出 而是 直接关闭浏览器
+   第五个bean
+
+   -->
+    <!--记住我 登录的时候 记住账号密码-->
+    <bean id ="rememberMeManager" class="org.apache.shiro.web.mgt.CookieRememberMeManager">
+        <property name="cookie" ref="rememberMeCookie"/>
+    </bean>
+    <bean id="rememberMeCookie" class="org.apache.shiro.web.servlet.SimpleCookie">
+       <!-- rememberMe是cookie的名字-->
+        <constructor-arg value="rememberMe"/>
+        <!--记住cookie生效时间-->
+        <property name="maxAge" value="2592000"/>
+    </bean>
+
+<!--session Session Manager：会话管理-->
+    <bean id="sessionManager" class="org.apache.shiro.web.session.mgt.DefaultWebSessionManager">
+        <property name="deleteInvalidSessions" value="true"/>
+        <property name="globalSessionTimeout" value="6000000"/>
+    </bean>
+
+
+
+  <!-- Caching缓存处理 ，在没有缓存的情况下 授权方法每一次执行都会进入这个请求，所以代码量越多，效率越低
+                        加入缓存之后；我只有第一次进入的时候会进入这个请求，完成之后会将我的角色列表，权限列表都存储再本地缓存中-->
+    <bean id="cacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+        <property name="cacheManagerConfigFile" value="classpath:shiro-ehcache.xml"/>
+    </bean>
+</beans>

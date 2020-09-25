@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.ssm.dao.UserDao">
+
+    <resultMap id="resultmap" type="user">
+        <id property="id" column="id"></id>
+        <result property="username" column="username"></result>
+        <result property="password" column="password"></result>
+        <result property="salt" column="salt"></result>
+
+
+        <association property="role" javaType="com.hdax.ssm.entity.Role">
+            <result property="roleName" column="roleName"></result>
+        </association>
+    </resultMap>
+
+    <!-- 登录-->
+    <select id="Find" resultMap="resultmap" parameterType="string">
+        select * from user
+         INNER    JOIN role
+        ON user.`id` =role.`roleId`
+        where username=#{username}
+    </select>
+
+
+
+
+
+
+
+
+</mapper>

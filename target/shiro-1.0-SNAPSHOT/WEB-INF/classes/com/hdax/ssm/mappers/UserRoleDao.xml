@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hdax.ssm.dao.UserRoleDao">
+  <!-- 管理员表user_id 对应 多个   职位role_id -->
+    <select id="getUserRoleId" parameterType="Integer" resultType="com.hdax.ssm.entity.UserRole">
+          select  role_id from  user_role where user_id = #{userId}
+    </select>
+
+
+</mapper>

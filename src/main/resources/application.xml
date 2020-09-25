@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+<!--                                  实现:整合mybatis   配置数据库-->
+
+  <!--    扫描datasourece.properties数据库文件-->
+  <context:property-placeholder location="classpath:datasource.properties"/>   <!--填空:datasource.properties-->
+<!--    扫描业务逻辑层service-->
+  <context:component-scan base-package="com.hdax.ssm.service"/>   <!--填空:业务逻辑层service路径-->
+
+
+<!--    配置数据库-->
+  <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+    <property name="url" value="${jdbc.url}"/>
+    <property name="driverClassName" value="${jdbc.driver}"/>
+    <property name="username" value="${jdbc.username}"/>
+    <property name="password" value="${jdbc.password}"/>
+    <property name="maxWait" value="10000"/>  <!--最大等待时长（可写可不写）-->
+    <property name="maxActive" value="100"/>  <!--最大连接数量（可写可不写）-->
+    <property name="maxIdle" value="30"/>     <!--最大空闲数量（可写可不写）-->
+    <property name="minIdle" value="5"/>      <!--最少空闲数量（可写可不写）-->
+  </bean>
+
+
+  <!--  (整合)配置 数据库,mybatis,省略路径,mappers文件等-->
+  <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+    <property name="dataSource" ref="dataSource"/>  <!--引用上方数据库配置-->
+    <property name="configLocation" value="classpath:mybatis-config.xml"/> <!--填空:mybatis-config.xml文件名-->
+    <property name="typeAliasesPackage" value="com.hdax.ssm.entity"/> <!--填空:省略实体类路径-->
+    <property name="mapperLocations" value="classpath:com/hdax/ssm/mappers/*.xml"/> <!--填空:mappers文件-->
+  </bean>
+
+  <!-- 将整合的资源做配置-->
+  <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+    <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"/> <!--配置整合好的资源-->
+   <!-- <property name="basePackage" value="com.hdax.ssm.mappers"/>-->  <!--填空:扫描所有接口(省略mappers的方法impl)-->
+      <property name="basePackage" value="com.hdax.ssm.dao"/>
+  </bean>
+</beans>

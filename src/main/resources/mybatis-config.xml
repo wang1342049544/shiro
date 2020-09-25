@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "mybatis-config" "mybatis-3-config.dtd" >
+<configuration>
+	<settings>
+		<!-- 日志实现方式 -->
+		<setting name="logImpl" value="LOG4J"/>
+	</settings>
+</configuration>
