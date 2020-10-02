@@ -43,6 +43,7 @@ public class LoginController {
     private PermissionDao permissionDao; //权限表
     @GetMapping(path = "/login")
     public ModelAndView login(Model model) {
+
         return new ModelAndView("login");
     }
 
@@ -111,4 +112,5 @@ public class LoginController {
         request.getSession().setAttribute("list2",list2);
         return new ModelAndView("index");
     }
+
 }

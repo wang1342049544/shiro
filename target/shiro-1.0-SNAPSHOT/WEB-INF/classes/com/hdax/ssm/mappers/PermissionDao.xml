@@ -4,14 +4,21 @@
 
     <select id="queryByPermissionIds" parameterType="list" resultType="permission">
         select * from permission where permissionId in
-    <!--    <where>
-            <if test=" permissionId != ''">
 
-            </if>
-        </where>-->
         <foreach collection="list" item="perid" open="(" separator="," close=")">
             #{perid}
         </foreach>
 
     </select>
+
+    <!--弹出来权限部分1-->
+    <select id="query" resultType="com.hdax.ssm.pojo.PermissionBean">
+        select permissionId as id,pName as text from permission where parentid = 0
+    </select>
+    <!--弹出来权限部分1-->
+    <select id="queryId" parameterType="long" resultType="com.hdax.ssm.pojo.PermissionBean">
+          select permissionId as id,pName as text from permission where parentid = #{parentid}
+    </select>
+
+
 </mapper>

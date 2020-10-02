@@ -6,5 +6,17 @@
     <select id="getPermissionByRoleId" resultType="int" parameterType="int">
         select permissionId as permissionId from role_permission where RoleId = #{roleId}
     </select>
-    
+
+    <select id="queryByRoleId" resultType="permission" parameterType="long">
+        select permissionId as permissionId from Role_permission where RoleId = #{roleId}
+    </select>
+
+
+    <delete id="del" parameterType="int">
+        delete from role_permission where roleId = #{roleId}
+    </delete>
+
+    <insert id="save">
+        insert into role_permission (RoleId,permissionId) values (#{roleId},#{permissionId})
+    </insert>
 </mapper>
